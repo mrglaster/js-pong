@@ -1,0 +1,40 @@
+
+html,
+body {
+  height: 97%;
+  padding: 0;
+  margin: 10px;
+  margin-bottom: 0;
+  background-color: black;
+}
+
+div>p {
+  margin-bottom: -15px;
+  font-family: sans-serif;
+}
+
+#canvas {
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  border: 0.2rem solid #00FFFF;
+  border-radius: 2rem;
+  padding: 0.4em;
+  box-shadow: 0 0 .2rem #00FFFF,
+            0 0 .2rem #00FFFF,
+            0 0 2rem #16eafe,
+            0 0 0.8rem #bc1ffe,
+            inset 0 0 1.3rem #16eafe; 
+}
+
+
+@font-face {
+    font-family: 'Galaxus';
+    src: url('../fonts/Galaxus-z8Mow.ttf');
+}
+@font-face {
+    font-family: 'Pong-Score';
+    src: url('../fonts/pong-score.ttf');
+}
+
+
