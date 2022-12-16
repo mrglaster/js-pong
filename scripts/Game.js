@@ -4,9 +4,9 @@ let PLAYER_VS_BOT = true
 
 let GAME_MODE = PLAYER_VS_PLAYER 
 let DIFFICULTY = 0
-let VELOCITY = 0
+let VELOCITY_D = 0
 
-let PLATFORM_HEIGHT = 80;
+let PLATFORM_HEIGHT = 0;
 let PLATFORL_WIDTH = 24;
 
 let LP_GOALS = 0
@@ -19,6 +19,8 @@ let WIN_SOUND = 'sound/win_sound.mp3'
 let LOOSE_SOUND = 'sound/loose_sound.mp3'
 let HIT_SOUND = 'sound/ball_hit.mp3'
 let START_SOUND = 'sound/start_sound.mp3'
+
+let BG_MUSIC = new Audio('/path/to/my/beat.mp3');
 
 class Platform {
     static get PID() {
@@ -172,6 +174,21 @@ class Game {
 
     onCreate() {
 
+        const urlParams = new URLSearchParams(window.location.search);
+        let got_dif = urlParams.get('df');
+        DIFFICULTY  = got_dif / 10
+        if (urlParams.get('gm') == 1) {GAME_MODE = PLAYER_VS_PLAYER; console.log("Using mode: Player vs Player")}
+        else {GAME_MODE = PLAYER_VS_BOT; console.log("Using mode: Player vs Bot");}
+
+        if (got_dif == 1 || got_dif == 2 || got_dif == 3) console.log("Something will be changed")
+
+        if (parseInt(got_dif) === 1 ) PLATFORM_HEIGHT = 120;
+        if (parseInt(got_dif) === 2) PLATFORM_HEIGHT = 80;
+        if (parseInt(got_dif) === 3) PLATFORM_HEIGHT = 40;
+
+        console.log(`Current platform size: ${PLATFORM_HEIGHT}`)
+       
+
         this.isBotLeft = false
 
         this.gameState = Game.States.WELCOME
@@ -207,7 +224,6 @@ class Game {
             this.rightPlatform : this.leftPlatform
         const targetL = this.isBotLeft ?
             this.leftPlatform : this.rightPlatform
-        // console.log(e, this);
         switch (e.keyCode) {
             case 32: // SPACE
                 if (this.gameState === Game.States.WELCOME) {
@@ -234,14 +250,12 @@ class Game {
                     target.velocity.y = 120
                 break
             case 87: // W
-                if (this.gameState === Game.States.GAME_PROCESS)
+                if (this.gameState === Game.States.GAME_PROCESS && !GAME_MODE)
                     targetL.velocity.y = -120
-                GAME_MODE = false
                 break
             case 83: // S
-                if (this.isPlaying)
+                if (this.isPlaying && !GAME_MODE)
                     targetL.velocity.y = 120
-                GAME_MODE = false
                 break
 
 
@@ -255,7 +269,6 @@ class Game {
     onUpdate(tFrame) {
         const dt = (tFrame - this.lastTick) / 1000
         this.lastTick = tFrame
-        // console.log('onUpdate', dt);
 
         if (this.gameState === Game.States.GAME_PROCESS ||
             this.gameState === Game.States.GAME_PLAYER_RESPAWN) {
@@ -273,8 +286,6 @@ class Game {
             }
         }
     }
-
-
 
 
     _update_score_context(ctx) {
@@ -341,14 +352,14 @@ class Game {
             this._play_sound(HIT_SOUND)
             this.ball.velocity.x *= -1
             if (this.ball.velocity.x < 0) {
-                this.ball.velocity.x -= VELOCITY
+                this.ball.velocity.x -= VELOCITY_D
                 if (this.ball.velocity.x < -700) this.ball.velocity.x = -700
             } else {
-                this.ball.velocity.x += VELOCITY
+                this.ball.velocity.x += VELOCITY_D
                 if (this.ball.velocity.x > 700) this.ball.velocity.x = 700
             }
             if (this.ball.velocity.x > -700 && this.ball.velocity.x < 700)
-                VELOCITY += 2
+                VELOCITY_D += 2
             
         }
     }
@@ -383,7 +394,7 @@ class Game {
 
         /**If player wins */
         if ((isLeft && this.isBotLeft) || (!isLeft && !this.isBotLeft)) {
-            LP_GOALS++ //добавляем бал левому игрок
+            LP_GOALS++ 
             if (GAME_MODE == PLAYER_VS_BOT) {
                 this._play_sound(WIN_SOUND)
                 DIFFICULTY += 0.2
@@ -399,7 +410,7 @@ class Game {
                 this.gameState = Game.States.GAME_PLAYER_RESPAWN
             }
         } else {
-            RP_GOALS++ //добавляем бал правому игроку
+            RP_GOALS++ 
             if (GAME_MODE == PLAYER_VS_BOT) {
                 DIFFICULTY -= 0.1
                 this._play_sound(LOOSE_SOUND)
@@ -408,6 +419,6 @@ class Game {
             target.velocity = new Vector2()
             this.gameState = Game.States.GAME_PLAYER_RESPAWN
         }
-        VELOCITY = 0
+        VELOCITY_D = 0
     }
 }
